@@ -1,0 +1,274 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+html {
+    scroll-behavior: smooth;
+}
+[id]:target {
+    padding-top: 80px;
+    margin-top: -80px;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
+
+.barra-botones {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start; /* Mueve todo el bloque a la izquierda */
+    /* Opcional: agrega un padding para que no se peguen al borde absoluto de la pantalla */
+    padding-left: 0px;
+    position: relative;
+    z-index: 20; /* Asegura que los botones estén por encima de todo */
+    /* ESTO ES LO QUE BUSCAS: */
+    margin-top: -0px; /* Ajusta este valor según cuánto quieras subirlo */
+    
+}
+/* Estilo para que resalten sobre el negro */
+.btn-nav {
+    background-color: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 20px 80px;
+    margin: 0 5px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-nav:hover {
+        background-color: #f4f4f4; /* Se vuelven negros al pasar el mouse */
+        color: #000; /* Texto blanco al pasar el mouse */
+        border: 1px solid #000;
+        transform: translateY(-5px);
+}
+/* ENCABEZADO */
+header {
+    background: linear-gradient( rgba(0,0,0,0.65), rgba(0,0,0,0.65) ), url('tu-fondo.jpg') no-repeat center center / cover;
+    background-color: #000000; /* Respaldo */
+}
+
+/* FOTO DE PERFIL */
+.rounded-circle {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 60%;
+    border: 6px solid white;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+    display: block;
+    margin: 0 auto;
+}
+/* NOMBRE PRINCIPAL */
+.display-4 {
+    font-size: 4rem;
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+/* SUBTÍTULO */
+.lead {
+    font-size: 1.2rem;
+    color: #e5e7eb;
+    max-width: 3100px;
+    margin: auto;
+}
+
+/* PERFIL */
+#contenedor-perfil {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* TÍTULOS */
+h1,
+h2,
+h3,
+h4,
+h5 {
+    text-align: center;
+}
+
+h3 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+/* EXPERIENCIA, EDUCACIÓN Y TECNOLOGÍAS */
+.resume-item {
+    border-left: 4px solid #0d6efd;
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease; /* Efecto suave */
+}
+
+.resume-item:hover {
+        transform: translateY(-5px); /* Se mueve solo cuando pasas el mouse */
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Mejora la sombra al levantar */
+}
+
+/* CONTENIDO GENERADO POR JS */
+#contenedor-experiencia,
+#lista-educacion,
+#lista-tecnologias {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.nivel-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.nivel-texto {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.circulo-nivel {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.circulo-nivel::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+}
+
+.circulo-nivel.basico {
+    background: conic-gradient(green 120deg, #ddd 120deg);
+}
+
+.circulo-nivel.intermedio {
+    background: conic-gradient(orange 240deg, #ddd 240deg);
+}
+
+.circulo-nivel.avanzado {
+    background: conic-gradient(red 330deg, #ddd 330deg);
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 4px solid #ddd;
+    border-top: 4px solid #0d6efd;
+    border-radius: 50%;
+    animation: girar 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes girar {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* SECCIONES */
+section {
+    margin-top: 50px;
+}
+
+/* LÍNEAS DE LOS TÍTULOS */
+.border-bottom {
+    border-color: #d1d5db !important;
+    margin-bottom: 25px;
+}
+
+/* CENTRAR PERFECTAMENTE EL HEADER */
+header .container,
+header .row,
+header .col-md-8 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 868px) {
+
+    /* Título */
+    .display-4 {
+        font-size: 2.2rem;
+    }
+
+    /* Subtítulo */
+    .lead {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+
+    /* Imagen */
+    .rounded-circle {
+        max-width: 180px;
+    }
+
+    .foto-derecha {
+        position: static;
+        transform: none;
+        display: block;
+        margin: 0 auto 20px auto;
+    }
+
+    /* Botones */
+    .barra-botones {
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .btn-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn-nav {
+        width: 100%;
+        margin: 5px 0;
+        padding: 15px;
+    }
+
+    /* Header */
+    header {
+        padding: 30px 10px;
+    }
+
+    /* Contenedor */
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    #lista-tecnologias {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}

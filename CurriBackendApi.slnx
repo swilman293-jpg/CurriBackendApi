@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/Data/">
+    <File Path="ApplicationDbContext.cs" />
+  </Folder>
+  <Folder Name="/Models/">
+    <File Path="Educacion.cs" />
+    <File Path="Habilidad.cs" />
+  </Folder>
+  <Project Path="CurriBackendApi.csproj" />
+</Solution>

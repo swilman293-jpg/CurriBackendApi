@@ -62,7 +62,7 @@ window.onload = () => {
     obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `
         <div class="resume-item">
             <h4>${e.cargo}</h4>
-            <p><strong>Empresa:</strong> ${e.experiencia}</p>
+            <p><strong>A cargo de:</strong> ${e.experiencia}</p>
            
             <p>Fecha Inicio: ${e.fechaIni.split("T")[0]}</p>
             <p>Fecha Fin: ${e.fechaFin.split("T")[0]}</p>

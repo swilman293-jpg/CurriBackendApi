@@ -47,7 +47,7 @@ window.onload = () => {
         });
     });
     // 1. Cargar Perfil
-    obtenerDatos('https://localhost:7179/api/Usu', 'contenedor-perfil', (u) => `
+    obtenerDatos('/api/Usu', 'contenedor-perfil', (u) => `
 <div class="perfil-card">
     <h1> Nombre: ${u.nombre || ''} ${u.apellido || ''}</h1>
     <p>Titulo profesional: ${u.tituloProfesional || ''}</p>
@@ -59,7 +59,7 @@ window.onload = () => {
     `);
 
     // 2. Cargar Experiencia
-    obtenerDatos('https://localhost:7179/api/Experiencia', 'contenedor-experiencia', (e) => `
+    obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `
         <div class="resume-item">
             <h4>${e.cargo}</h4>
             <p><strong>Empresa:</strong> ${e.experiencia}</p>
@@ -70,7 +70,7 @@ window.onload = () => {
     `);
 
     // 3. Cargar Educación
-    obtenerDatos('https://localhost:7179/api/Educacion', 'lista-educacion', (ed) => `
+    obtenerDatos('/api/Educacion', 'lista-educacion', (ed) => `
         <div class="resume-item">
             <h4>Institución: ${ed.institución}</h4>
             <p>Titulo: ${ed.titulo_Obtenido}</p>
@@ -79,7 +79,7 @@ window.onload = () => {
         </div>
     `);
     // 3. Cargar Habilidad
-    obtenerDatos('https://localhost:7179/api/Habilidades', 'lista-tecnologias', (h) => {
+    obtenerDatos('/api/Habilidades', 'lista-tecnologias', (h) => {
         
         const circuloHTML = crearCirculoNivel(h.nivel);
         console.log(circuloHTML);

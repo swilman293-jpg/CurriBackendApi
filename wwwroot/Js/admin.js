@@ -18,7 +18,7 @@
         console.log("Enviando:", nuevaEducacion);
 
         try {
-            const response = await fetch('https://localhost:7179/api/Educacion', {
+            const response = await fetch('/api/Educacion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(nuevaEducacion)

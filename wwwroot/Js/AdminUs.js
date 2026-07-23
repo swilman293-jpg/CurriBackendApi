@@ -23,7 +23,7 @@
             console.log("Enviando:", nuevaUsuario);
 
             try {
-                const response = await fetch('https://localhost:7179/api/Usu', {
+                const response = await fetch('/api/Usu', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(nuevaUsuario)

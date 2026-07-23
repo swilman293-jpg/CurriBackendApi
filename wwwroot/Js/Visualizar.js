@@ -1,7 +1,7 @@
 ﻿/*async function obtenerDatos() {
     try {
         // La URL debe ser exactamente la de tu endpoint GET
-        const response = await fetch('https://localhost:7179/api/Usu');
+        const response = await fetch('/api/Usu');
         const datos = await response.json();
 
         const contenedor = document.getElementById('contenedor-perfil');

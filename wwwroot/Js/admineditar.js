@@ -3,7 +3,7 @@
     document.getElementById('cargarParaEditar')
         .addEventListener('click', async () => {
             try {
-                const res = await fetch('https://localhost:7179/api/Usu');
+                const res = await fetch('/api/Usu');
                 const usuarios = await res.json();
                 if (usuarios.length === 0) {
                     alert('No hay usuarios para editar.');
@@ -28,7 +28,7 @@
     document.getElementById('btnActualizarTodo')
         .addEventListener('click', async () => {
             try {
-                const res = await fetch('https://localhost:7179/api/Usu');
+                const res = await fetch('/api/Usu');
                 const usuarios = await res.json();
                 if (usuarios.length === 0) {
                     alert('No hay usuarios para actualizar.');
@@ -45,7 +45,7 @@
                     LinkedinUrl: document.getElementById('link').value,
                     GithubUrl: document.getElementById('gith').value
                 };
-                const putRes = await fetch('https://localhost:7179/api/Usu/' + id, {
+                const putRes = await fetch('/api/Usu/' + id, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(datos)

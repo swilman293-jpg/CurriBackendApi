@@ -10,7 +10,8 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "5179";
 builder.WebHost.UseUrls($"http://+:{port}");
 
 // 1. Servicios
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<CurriBackendApi.Data.ApplicationDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
@@ -47,19 +48,22 @@ app.UseStaticFiles();
 app.UseAuthorization();
 app.MapControllers();
 
-// 3. Verificación de BD
-using (var scope = app.Services.CreateScope())
+// 3. Verificación de BD - solo en desarrollo
+if (app.Environment.IsDevelopment())
 {
-    var services = scope.ServiceProvider;
-    try
+    using (var scope = app.Services.CreateScope())
     {
-        var contexto = services.GetRequiredService<CurriBackendApi.Data.ApplicationDbContext>();
-        contexto.Database.EnsureCreated();
-        Console.WriteLine("¡Base de datos y tablas verificadas con éxito!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error de base de datos: {ex.Message}");
+        var services = scope.ServiceProvider;
+        try
+        {
+            var contexto = services.GetRequiredService<CurriBackendApi.Data.ApplicationDbContext>();
+            contexto.Database.EnsureCreated();
+            Console.WriteLine("¡Base de datos y tablas verificadas con éxito!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error de base de datos: {ex.Message}");
+        }
     }
 }
 

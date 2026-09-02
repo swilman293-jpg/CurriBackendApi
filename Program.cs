@@ -40,11 +40,17 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("MiPoliticaCORS"); // Solo una vez es suficiente
 
 // Archivos estáticos - servir ambos HTMLs directamente
-// Sin UseDefaultFiles para que admin.html sea accesible directamente
 app.UseStaticFiles();
 
-app.MapGet("/", () => Results.File(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "index.html")));
-app.MapGet("/admin.html", () => Results.File(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "admin.html")));
+// También servimos index.html y admin.html explícitamente para Render
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/" || context.Request.Path == "/index.html")
+    {
+        context.Request.Path = "/index.html";
+    }
+    await next();
+});
 
 app.UseAuthorization();
 app.MapControllers();

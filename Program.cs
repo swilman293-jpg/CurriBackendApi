@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // No es necesario forzar UseUrls, Render lo asigna internamente
 
 // 1. Servicios
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
+    ?? "Server=localhost;Port=5432;Database=curriculum_db;User=postgres;Password=";
 
 builder.Services.AddDbContext<CurriBackendApi.Data.ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -40,17 +41,12 @@ if (!app.Environment.IsDevelopment())
 app.UseCors("MiPoliticaCORS"); // Solo una vez es suficiente
 
 // Archivos estáticos - servir ambos HTMLs directamente
+// UseStaticFiles() sirve archivos de wwwroot automáticamente
 app.UseStaticFiles();
 
-// También servimos index.html y admin.html explícitamente para Render
-app.Use(async (context, next) =>
-{
-    if (context.Request.Path == "/" || context.Request.Path == "/index.html")
-    {
-        context.Request.Path = "/index.html";
-    }
-    await next();
-});
+// Servir index.html en la ruta raíz
+app.UseDefaultFiles();
+// Esto asegurará que / muestre index.html
 
 app.UseAuthorization();
 app.MapControllers();

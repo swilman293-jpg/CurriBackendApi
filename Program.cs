@@ -5,9 +5,8 @@ using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Railway asigna el puerto via variable de entorno PORT
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5179";
-builder.WebHost.UseUrls($"http://+:{port}");
+// Puerto asignado por Render/Docker de forma automática
+// No es necesario forzar UseUrls, Render lo asigna internamente
 
 // 1. Servicios
 var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");

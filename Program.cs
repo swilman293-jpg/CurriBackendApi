@@ -10,11 +10,10 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "5179";
 builder.WebHost.UseUrls($"http://+:{port}");
 
 // 1. Servicios
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<CurriBackendApi.Data.ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
 
+builder.Services.AddDbContext<CurriBackendApi.Data.ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

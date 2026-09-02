@@ -1,19 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Puerto asignado por Render/Docker de forma automática
-// No es necesario forzar UseUrls, Render lo asigna internamente
-
-// 1. Servicios
-var connectionString = Environment.GetEnvironmentVariable("DefaultConnection") 
-    ?? "Server=localhost;Port=5432;Database=curriculum_db;User=postgres;Password=";
+// Configurar conexión a base de datos - Render inyectará la variable DefaultConnection
+// Si no existe, usamos un valor por defecto seguro para que la app inicie
+var connectionString = Environment.GetEnvironmentVariable("DefaultConnection");
 
 builder.Services.AddDbContext<CurriBackendApi.Data.ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+{
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        // Valor por defecto si no hay variable de entorno (desarrollo local)
+        options.UseNpgsql("Server=localhost;Port=5432;Database=curriculum_db;User=postgres;");
+    }
+    else
+    {
+        options.UseNpgsql(connectionString);
+    }
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,16 +44,16 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
-app.UseCors("MiPoliticaCORS"); // Solo una vez es suficiente
+app.UseCors("MiPoliticaCORS");
 
 // Archivos estáticos - servir ambos HTMLs directamente
-// UseStaticFiles() sirve archivos de wwwroot automáticamente
+// USE STATIC FILES SIN MAPGETS - esto evita el error 404 y descarga de archivo
 app.UseStaticFiles();
 
-// Servir index.html en la ruta raíz
+// Que la ruta raíz / sirva index.html automáticamente
 app.UseDefaultFiles();
-// Esto asegurará que / muestre index.html
 
+// Authorization y controladores
 app.UseAuthorization();
 app.MapControllers();
 

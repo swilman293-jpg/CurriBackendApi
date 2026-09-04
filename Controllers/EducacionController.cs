@@ -1,6 +1,7 @@
 ﻿using CurriBackendApi.Data;
 using CurriBackendApi.DTOs;
 using CurriBackendApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,12 +22,12 @@ namespace CurriBackendApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            // Cambia 'tecnologias' por la tabla que corresponda en tu DbContext
             return Ok(await _context.educación.ToListAsync());
         }
 
         // POST: api/
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] Educacion item)
         {
             try
@@ -34,17 +35,29 @@ namespace CurriBackendApi.Controllers
                 if (item == null) return BadRequest("Datos inválidos.");
 
                 _context.educación.Add(item);
-                await _context.SaveChangesAsync(); // Aquí es donde suele fallar
+                await _context.SaveChangesAsync();
 
                 return Ok(new { mensaje = "Guardado con éxito." });
             }
             catch (Exception ex)
             {
-                // Esto atrapará cualquier error de la base de datos y lo mostrará en el navegador
                 return StatusCode(500, "Error al guardar en BD: " + ex.InnerException?.Message ?? ex.Message);
             }
         }
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var ed = await _context.educación.FindAsync(id);
+            if (ed == null) return NotFound();
+
+            _context.educación.Remove(ed);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensaje = "Eliminado con éxito." });
+        }
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] EducacionDTOs dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -53,7 +66,6 @@ namespace CurriBackendApi.Controllers
                 var ed = await _context.educación.FindAsync(id);
                 if (ed == null) return NotFound();
 
-                // Mapeo manual: simple, directo y sin errores de EntityState
                 ed.Institución = dto.Institución;
                 ed.Titulo_Obtenido = dto.Titulo_Obtenido;
                 ed.Fecha_Inicio = dto.Fecha_Inicio;
@@ -68,7 +80,6 @@ namespace CurriBackendApi.Controllers
                 await transaction.RollbackAsync();
                 return StatusCode(500, "Error al actualizar");
             }
-
         }
     }
 }

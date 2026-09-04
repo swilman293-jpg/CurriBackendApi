@@ -4,17 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Portafolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/Style.css">
 </head>
-   
+
 <body class="bg-light">
+    <nav class="navbar navbar-dark navbar-expand-lg navbar-glass sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Wilman Sánchez</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="#perfil">Perfil</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#experiencia">Experiencia</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#educacion">Formación</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tecnologias">Lenguajes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pruebas">Pruebas</a></li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+                        <button class="btn btn-admin btn-sm" onclick="abrirAdmin()">Admin</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <header class="bg-dark text-white text-center py-5">
-        <div class="container py-5">
+        <div class="container py-5 reveal">
             <div class="row justify-content-center">
                 <div class="col-12 text-center">
                     <img src="Foto/foto.jpg" class="rounded-circle mb-3 shadow">
-                    <h1 class="display-4">Wilman Jesus Sánchez Benavides</h1>
+                    <h1 class="display-4 hero-nombre">Wilman Jesus Sánchez Benavides</h1>
                     <h1 class="display-4">Celular: 0997806918</h1>
                     <p class="lead">
                         Ingeniero en Sistemas de 28 años de edad, con
@@ -24,75 +48,279 @@
                         por ser una persona responsable, proactiva y
                         enfocada en el aprendizaje continuo.
                     </p>
+                    <div id="stats-hero" class="stats-hero mt-5"></div>
                 </div>
             </div>
         </div>
     </header>
 
-<!-- Botón Admin en esquina superior derecha -->
-<div style="position: fixed; top: 10px; right: 10px;">
-  <a href="/admin.html" 
-     style="padding: 8px 16px; font-size: 14px; 
-            background: #4CAF50; color: white; 
-            text-decoration: none; 
-            border-radius: 4px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-    Admin
-  </a>
-</div>
+    <!-- Botón Admin integrado en la navbar -->
 
-        <div class="barra-botones">
-            <div class="btn-group shadow-sm" role="group">
-                <button class="btn-nav" data-id="contenedor-experiencia">EXPERIENCIA</button>
-                <button class="btn-nav" data-id="lista-educacion">FORMACIÓN</button>
-                <button class="btn-nav" data-id="lista-tecnologias">LENGUAJE</button>
-            </div>
+    <div class="container my-5 reveal" id="perfil">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3 class="border-bottom pb-2">Perfil</h3>
+                <div id="contenedor-perfil">
                 </div>
-        <div class="container my-5">
-            <div class="row">
-                <div class="col-md-8 offset-md-2">
-                    <h3 class="border-bottom pb-2">Perfil</h3>
-                    <div id="contenedor-perfil">
+            </div>
+        </div>
+    </div>
+    <h3 class="text-center mb-4">Perfil Profesional</h3>
+
+    <div class="row justify-content-center g-4 reveal">
+
+        <div class="col-md-4" id="experiencia">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Experiencia</h4>
+                    <div id="contenedor-experiencia"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="educacion">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Formación Académica</h4>
+                    <div id="lista-educacion"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" id="tecnologias">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-center">Lenguajes Dominados</h4>
+                    <div id="lista-tecnologias"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container my-5 reveal" id="pruebas">
+        <h3 class="text-center mb-4">Pruebas realizadas</h3>
+        <div class="row justify-content-center g-4" id="contenedor-pruebas">
+        </div>
+    </div>
+
+    <!-- Modal para ver imagen ampliada (lightbox) -->
+    <div class="modal fade" id="modal-luz" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content bg-dark border-0">
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title">Evidencia <span id="luz-contador" class="badge bg-light text-dark ms-2"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center bg-dark d-flex align-items-center justify-content-center">
+                    <button type="button" class="luz-nav luz-prev" id="luz-prev" aria-label="Anterior">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
+                    <img id="imagen-luz" src="" alt="Evidencia ampliada">
+                    <button type="button" class="luz-nav luz-next" id="luz-next" aria-label="Siguiente">
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
+                </div>
+                <div class="modal-footer bg-dark border-0 justify-content-center">
+                    <p id="luz-caption" class="text-white-50 mb-0" style="max-width: 720px;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal LOGIN -->
+    <div class="modal fade" id="modal-login" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 360px;">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Acceso Administrador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="alerta-login"></div>
+                    <form id="form-login">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="login-email" class="form-control" required autocomplete="username">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" id="login-password" class="form-control" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Iniciar Sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal PANEL ADMIN -->
+    <div class="modal fade" id="modal-panel" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">Panel de Administración</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-light me-2" onclick="cerrarPanel()">Cerrar</button>
+                        <button class="btn btn-sm btn-danger" onclick="cerrarSesion()">Cerrar sesión</button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="alerta-panel"></div>
+                    <ul class="nav nav-tabs" id="tab-admin" role="tablist">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-perfil" type="button">Perfil</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-educacion" type="button">Educación</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-experiencia" type="button">Experiencia</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tecnologias" type="button">Tecnologías</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pruebas" type="button">Pruebas</button></li>
+                    </ul>
+                    <div class="tab-content pt-4">
+
+                        <!-- TAB PERFIL -->
+                        <div class="tab-pane fade show active" id="tab-perfil">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Agregar / Editar Perfil</h6>
+                                    <form id="form-usuario">
+                                        <input type="hidden" id="usuario-id">
+                                        <div class="row g-3">
+                                            <div class="col-md-6"><label class="form-label">Nombre</label><input id="usuario-nombre" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Apellido</label><input id="usuario-apellido" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Título Profesional</label><input id="usuario-titulo" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Email</label><input id="usuario-email" class="form-control" type="email"></div>
+                                            <div class="col-md-6"><label class="form-label">Teléfono</label><input id="usuario-telefono" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">GitHub URL</label><input id="usuario-github" class="form-control"></div>
+                                            <div class="col-12"><label class="form-label">Acerca de mí</label><textarea id="usuario-acercade" class="form-control" rows="3"></textarea></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3" id="btn-usuario-guardar">Guardar</button>
+                                        <button type="button" class="btn btn-secondary mt-3 d-none" onclick="cancelarEdicion('usuario')">Cancelar edición</button>
+                                    </form>
+                                    <hr>
+                                    <h6 class="card-title">Perfiles guardados</h6>
+                                    <div id="listado-usuarios"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB EDUCACION -->
+                        <div class="tab-pane fade" id="tab-educacion">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Agregar / Editar Educación</h6>
+                                    <form id="form-educacion">
+                                        <input type="hidden" id="educacion-id">
+                                        <div class="row g-3">
+                                            <div class="col-md-6"><label class="form-label">Institución</label><input id="educacion-institucion" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Título obtenido</label><input id="educacion-titulo" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Fecha inicio</label><input id="educacion-fechainicio" type="date" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Fecha fin</label><input id="educacion-fechafin" type="date" class="form-control"></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                                        <button type="button" class="btn btn-secondary mt-3 d-none" onclick="cancelarEdicion('educacion')">Cancelar edición</button>
+                                    </form>
+                                    <hr>
+                                    <h6 class="card-title">Educación guardada</h6>
+                                    <div id="listado-educaciones"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB EXPERIENCIA -->
+                        <div class="tab-pane fade" id="tab-experiencia">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Agregar / Editar Experiencia</h6>
+                                    <form id="form-experiencia">
+                                        <input type="hidden" id="experiencia-id">
+                                        <div class="row g-3">
+                                            <div class="col-md-6"><label class="form-label">Empresa / Lugar</label><input id="experiencia-lugar" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Cargo</label><input id="experiencia-cargo" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Fecha inicio</label><input id="experiencia-fechainicio" type="date" class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Fecha fin</label><input id="experiencia-fechafin" type="date" class="form-control"></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                                        <button type="button" class="btn btn-secondary mt-3 d-none" onclick="cancelarEdicion('experiencia')">Cancelar edición</button>
+                                    </form>
+                                    <hr>
+                                    <h6 class="card-title">Experiencia guardada</h6>
+                                    <div id="listado-experiencias"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB TECNOLOGIAS -->
+                        <div class="tab-pane fade" id="tab-tecnologias">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Agregar / Editar Tecnología</h6>
+                                    <form id="form-tecnologia">
+                                        <input type="hidden" id="tecnologia-id">
+                                        <div class="row g-3">
+                                            <div class="col-md-6"><label class="form-label">Lenguaje / Tecnología</label><input id="tecnologia-nombre" class="form-control"></div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Nivel</label>
+                                                <select id="tecnologia-nivel" class="form-select">
+                                                    <option value="Basico">Básico</option>
+                                                    <option value="Intermedio">Intermedio</option>
+                                                    <option value="Avanzado">Avanzado</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+                                        <button type="button" class="btn btn-secondary mt-3 d-none" onclick="cancelarEdicion('tecnologia')">Cancelar edición</button>
+                                    </form>
+                                    <hr>
+                                    <h6 class="card-title">Tecnologías guardadas</h6>
+                                    <div id="listado-tecnologias-admin"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB PRUEBAS -->
+                        <div class="tab-pane fade" id="tab-pruebas">
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title">Agregar / Editar Prueba (evidencia Swagger / Postman)</h6>
+                                    <form id="form-prueba">
+                                        <input type="hidden" id="prueba-id">
+                                        <div class="row g-3">
+                                            <div class="col-12"><label class="form-label">Descripción de la prueba</label><textarea id="prueba-descripcion" class="form-control" rows="2"></textarea></div>
+                                            <div class="col-md-6"><label class="form-label">Fotos evidencia <span class="text-muted small">(elige varias si forman una misma)</span></label><input id="prueba-imagen" type="file" accept="image/*" multiple class="form-control"></div>
+                                            <div class="col-md-6"><label class="form-label">Grupo (opcional)</label><input id="prueba-grupo" class="form-control" placeholder="ej: certificado-meta"><div class="form-text">Las fotos con el mismo grupo se muestran juntas.</div></div>
+                                            <div class="col-md-6"><label class="form-label">Usuario</label><input id="prueba-usuario" class="form-control" placeholder="admin@curriculum.com"></div>
+                                            <div class="col-md-6"><label class="form-label">JWT usado</label><input id="prueba-jwt" class="form-control"></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-3">Guardar prueba</button>
+                                        <button type="button" class="btn btn-secondary mt-3 d-none" onclick="cancelarEdicion('prueba')">Cancelar edición</button>
+                                    </form>
+                                    <hr>
+                                    <h6 class="card-title">Pruebas guardadas</h6>
+                                    <div id="listado-pruebas-admin"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-        <h3 class="text-center mb-4">Perfil Profesional</h3>
+    </div>
 
-        <div class="row justify-content-center g-4">
-
-            <div class="col-md-4" id="experiencia">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title text-center">Experiencia</h4>
-                        <div id="contenedor-experiencia"></div>
-                    </div>
-                </div>
+    <footer class="footer mt-5">
+        <div class="container py-4 text-center">
+            <div class="mb-2">
+                <a id="link-github" href="#" target="_blank" rel="noopener" class="btn-social">GitHub</a>
+                <span class="mx-2 text-white-50">|</span>
+                <a id="link-email" href="#" class="btn-social">Email</a>
             </div>
-
-            <div class="col-md-4" id="educacion">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title text-center">Formación Académica</h4>
-                        <div id="lista-educacion"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4" id="tecnologias">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title text-center">Lenguajes Dominados</h4>
-                        <div id="lista-tecnologias"></div>
-                    </div>
-                </div>
-            </div>
-
+            <div class="text-white-50 small">© <span id="anio"></span> Wilman Jesús Sánchez Benavides · Todos los derechos reservados.</div>
         </div>
-        <script type="module" src="Js/index.js"></script>
+    </footer>
 
-
-
+    <script src="Js/config.js"></script>
+    <script type="module" src="Js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="Js/adminPanel.js"></script>
 
 </body>
 </html>

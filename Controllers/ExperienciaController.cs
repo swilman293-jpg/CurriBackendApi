@@ -1,6 +1,7 @@
 ﻿using CurriBackendApi.Data;
 using CurriBackendApi.DTOs;
-using CurriBackendApi.Models; // ¡Importante para reconocer tus clases de Models!
+using CurriBackendApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +9,7 @@ namespace CurriBackendApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ExperienciaController : ControllerBase // Cambia Habilidades por Educacion, Experiencia, etc.
+    public class ExperienciaController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -21,17 +22,16 @@ namespace CurriBackendApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            // Cambia 'tecnologias' por la tabla que corresponda en tu DbContext
             return Ok(await _context.experiencia_laboral.ToListAsync());
         }
 
         // POST: api/Habilidades
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] Experiencialaboral item)
         {
             if (!ModelState.IsValid)
             {
-                // Esto devolverá un JSON con el error específico de cada campo
                 return BadRequest(ModelState);
             }
 
@@ -46,7 +46,20 @@ namespace CurriBackendApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var e = await _context.experiencia_laboral.FindAsync(id);
+            if (e == null) return NotFound();
+
+            _context.experiencia_laboral.Remove(e);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { mensaje = "Eliminado con éxito." });
+        }
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] ExperiencialaboralDTOs dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -54,8 +67,6 @@ namespace CurriBackendApi.Controllers
             {
                 var e = await _context.experiencia_laboral.FindAsync(id);
                 if (e == null) return NotFound();
-
-                // Mapeo manual: simple, directo y sin errores de EntityState
 
                 e.Experiencia = dto.Experiencia;
                 e.Cargo = dto.Cargo;
@@ -71,7 +82,6 @@ namespace CurriBackendApi.Controllers
                 await transaction.RollbackAsync();
                 return StatusCode(500, "Error al actualizar");
             }
-
         }
     }
 }

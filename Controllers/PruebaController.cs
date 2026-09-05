@@ -1,5 +1,6 @@
 using CurriBackendApi.Data;
 using CurriBackendApi.Models;
+using CurriBackendApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +13,13 @@ namespace CurriBackendApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly ImagenService _imagenService;
 
-        public PruebaController(ApplicationDbContext context, IWebHostEnvironment environment)
+        public PruebaController(ApplicationDbContext context, IWebHostEnvironment environment, ImagenService imagenService)
         {
             _context = context;
             _environment = environment;
+            _imagenService = imagenService;
         }
 
         [HttpGet]
@@ -34,29 +37,13 @@ namespace CurriBackendApi.Controllers
                 return BadRequest(new { message = "La descripción es requerida" });
             }
 
-            var imagenUrl = string.Empty;
-
-            if (dto.Imagen != null && dto.Imagen.Length > 0)
-            {
-                var uploadsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads");
-                Directory.CreateDirectory(uploadsDir);
-
-                var extension = Path.GetExtension(dto.Imagen.FileName).ToLower();
-                var nombreArchivo = $"{Guid.NewGuid():N}{extension}";
-                var rutaCompleta = Path.Combine(uploadsDir, nombreArchivo);
-
-                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-                {
-                    await dto.Imagen.CopyToAsync(stream);
-                }
-
-                imagenUrl = $"/uploads/{nombreArchivo}";
-            }
+            var (imagenUrl, publicId) = await GuardarImagenAsync(dto.Imagen, string.Empty, null);
 
             var prueba = new Prueba
             {
                 Descripcion = dto.Descripcion,
-                ImagenUrl = imagenUrl,
+                ImagenUrl = imagenUrl ?? string.Empty,
+                PublicId = publicId,
                 Grupo = dto.Grupo ?? string.Empty,
                 JwtToken = dto.JwtToken ?? string.Empty,
                 UsuarioEmail = dto.UsuarioEmail ?? string.Empty,
@@ -86,28 +73,9 @@ namespace CurriBackendApi.Controllers
 
                 if (dto.Imagen != null && dto.Imagen.Length > 0)
                 {
-                    var uploadsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads");
-                    Directory.CreateDirectory(uploadsDir);
-
-                    var extension = Path.GetExtension(dto.Imagen.FileName).ToLower();
-                    var nombreArchivo = $"{Guid.NewGuid():N}{extension}";
-                    var rutaCompleta = Path.Combine(uploadsDir, nombreArchivo);
-
-                    using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-                    {
-                        await dto.Imagen.CopyToAsync(stream);
-                    }
-
-                    if (!string.IsNullOrEmpty(prueba.ImagenUrl))
-                    {
-                        var rutaVieja = Path.Combine(_environment.WebRootPath ?? "wwwroot", prueba.ImagenUrl.TrimStart('/'));
-                        if (System.IO.File.Exists(rutaVieja))
-                        {
-                            System.IO.File.Delete(rutaVieja);
-                        }
-                    }
-
-                    prueba.ImagenUrl = $"/uploads/{nombreArchivo}";
+                    var (imagenUrl, publicId) = await GuardarImagenAsync(dto.Imagen, prueba.ImagenUrl, prueba.PublicId);
+                    prueba.ImagenUrl = imagenUrl ?? prueba.ImagenUrl;
+                    prueba.PublicId = publicId ?? prueba.PublicId;
                 }
 
                 await _context.SaveChangesAsync();
@@ -128,19 +96,57 @@ namespace CurriBackendApi.Controllers
             var prueba = await _context.pruebas.FindAsync(id);
             if (prueba == null) return NotFound();
 
-            if (!string.IsNullOrEmpty(prueba.ImagenUrl))
-            {
-                var rutaVieja = Path.Combine(_environment.WebRootPath ?? "wwwroot", prueba.ImagenUrl.TrimStart('/'));
-                if (System.IO.File.Exists(rutaVieja))
-                {
-                    System.IO.File.Delete(rutaVieja);
-                }
-            }
+            await EliminarSiExiste(prueba.ImagenUrl, prueba.PublicId);
 
             _context.pruebas.Remove(prueba);
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Eliminado con éxito." });
+        }
+
+        private async Task<(string? Url, string? PublicId)> GuardarImagenAsync(IFormFile? imagen, string urlActual, string? publicIdActual)
+        {
+            if (imagen == null || imagen.Length == 0) return (null, null);
+
+            var subida = await _imagenService.SubirImagenAsync(imagen);
+            if (subida != null)
+            {
+                await EliminarSiExiste(urlActual, publicIdActual);
+                return (subida.Value.Url, subida.Value.PublicId);
+            }
+
+            var uploadsDir = Path.Combine(_environment.WebRootPath ?? "wwwroot", "uploads");
+            Directory.CreateDirectory(uploadsDir);
+
+            var extension = Path.GetExtension(imagen.FileName).ToLower();
+            var nombreArchivo = $"{Guid.NewGuid():N}{extension}";
+            var rutaCompleta = Path.Combine(uploadsDir, nombreArchivo);
+
+            using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+            {
+                await imagen.CopyToAsync(stream);
+            }
+
+            await EliminarSiExiste(urlActual, publicIdActual);
+            return ($"/uploads/{nombreArchivo}", null);
+        }
+
+        private async Task EliminarSiExiste(string? urlActual, string? publicIdActual)
+        {
+            if (!string.IsNullOrEmpty(publicIdActual))
+            {
+                await _imagenService.EliminarImagenAsync(publicIdActual);
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(urlActual) && urlActual.StartsWith("/"))
+            {
+                var rutaVieja = Path.Combine(_environment.WebRootPath ?? "wwwroot", urlActual.TrimStart('/'));
+                if (System.IO.File.Exists(rutaVieja))
+                {
+                    System.IO.File.Delete(rutaVieja);
+                }
+            }
         }
     }
 

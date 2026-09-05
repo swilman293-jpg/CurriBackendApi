@@ -1,6 +1,6 @@
 // URL base de la API (Render). Cambiar aquí cuando se despliegue.
 // Vacío = la misma aplicación sirve la API y las fotos (desarrollo).
-window.API_BASE = '';
+window.API_BASE = 'https://curribackendapi-1.onrender.com';
 
 // Convierte una ruta de la API ('/api/...') en URL completa.
 function apiUrl(ruta) {

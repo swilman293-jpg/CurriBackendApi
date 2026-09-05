@@ -13,6 +13,8 @@ namespace CurriBackendApi.Models
 
         public string ImagenUrl { get; set; } = string.Empty;
 
+        public string? PublicId { get; set; }
+
         public string Grupo { get; set; } = string.Empty;
 
         public string JwtToken { get; set; } = string.Empty;

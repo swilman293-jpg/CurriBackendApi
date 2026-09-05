@@ -6,3 +6,6 @@ obj/
 *.vsidx
 appsettings.Development.json
 wwwroot/uploads/
+
+.firebase/
+firebase-debug.log

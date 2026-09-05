@@ -263,7 +263,6 @@ async function cargarPruebas() {
                 <div class="card h-100 shadow-sm prueba-card">
                     <div class="card-body">
                         <p class="card-text text-start m-0 prueba-desc">${p.descripcion || ''}</p>
-                        <small class="prueba-usuario text-start d-block mt-3">${p.usuarioEmail || ''}</small>
                     </div>
                 </div>
             </div>`;
@@ -301,7 +300,6 @@ async function cargarPruebas() {
                         ${foto}
                         <div class="card-body">
                             <p class="card-text text-start m-0 prueba-desc">${items[0].descripcion || ''}</p>
-                            <small class="prueba-usuario text-start d-block mt-3">${items[0].usuarioEmail || ''}</small>
                         </div>
                     </div>
                 </div>`;

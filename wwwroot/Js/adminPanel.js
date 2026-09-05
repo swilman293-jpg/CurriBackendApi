@@ -378,7 +378,7 @@ async function cargarPruebasAdmin() {
             <div class="flex-grow-1">
                 <strong>${p.descripcion || ''}</strong>
                 ${p.grupo ? ` <span class="badge bg-info text-dark">${p.grupo}</span>` : ''}
-                <div class="text-muted small">${p.usuarioEmail || ''} · ${(p.createdAt || '').replace('T', ' ').split('.')[0]}</div>
+                <div class="text-muted small">${(p.createdAt || '').replace('T', ' ').split('.')[0]}</div>
             </div>
             <div class="botones-item">
                 ${p.imagenUrl ? `<a class="btn btn-sm btn-outline-secondary" href="${archivoUrl(p.imagenUrl)}" target="_blank">Ver foto</a>` : ''}

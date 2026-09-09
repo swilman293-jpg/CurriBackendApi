@@ -402,6 +402,22 @@ header .col-md-8 {
     flex-shrink: 0;
 }
 
+/* TARJETAS BOOTSTRAP - TEMA OSCURO */
+.card {
+    --bs-card-bg: var(--fondo-tarjeta);
+    background-color: var(--fondo-tarjeta);
+    border-color: rgba(0, 212, 255, 0.18);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 212, 255, 0.12);
+}
+
+.card-title {
+    color: #ffffff;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
 /* PRUEBAS - TARJETAS PREMIUM */
 .prueba-card {
     position: relative;

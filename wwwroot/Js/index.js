@@ -207,20 +207,14 @@ const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function aplicarTilt(tarjetas) {
     tarjetas.forEach(card => {
-        let frame = null;
         card.addEventListener('mousemove', (e) => {
-            if (frame) return;
-            frame = requestAnimationFrame(() => {
-                frame = null;
-                const r = card.getBoundingClientRect();
-                const x = (e.clientX - r.left) / r.width - 0.5;
-                const y = (e.clientY - r.top) / r.height - 0.5;
-                card.style.transform =
-                    `perspective(900px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) translateY(-6px)`;
-            });
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - 0.5;
+            const y = (e.clientY - r.top) / r.height - 0.5;
+            card.style.transform =
+                `perspective(900px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) translateY(-6px)`;
         });
         card.addEventListener('mouseleave', () => {
-            if (frame) { cancelAnimationFrame(frame); frame = null; }
             card.style.transform = '';
         });
     });
@@ -283,7 +277,7 @@ async function cargarPruebas() {
                     <div class="prueba-portada">
                         ${items.map((p, ii) => `
                             <div class="prueba-pagina ${ii === 0 ? 'activa' : ''}">
-                                <img src="${archivoUrl(p.imagenUrl)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer" loading="lazy" fetchpriority="low">
+                                <img src="${archivoUrl(p.imagenUrl)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer">
                             </div>`).join('')}
                         <span class="badge-ev">EVIDENCIA</span>
                         <span class="prueba-fecha">${fecha}</span>
@@ -296,7 +290,7 @@ async function cargarPruebas() {
                         <div class="prueba-strip">
                             ${items.map((p, ii) => `
                                 <button type="button" class="prueba-thumb ${ii === 0 ? 'activa' : ''}" data-page="${ii}" aria-label="Foto ${ii + 1}">
-                                    <img src="${archivoUrl(p.imagenUrl)}" alt="" loading="lazy" fetchpriority="low">
+                                    <img src="${archivoUrl(p.imagenUrl)}" alt="">
                                 </button>`).join('')}
                         </div>` : ''}
                 </div>`;
@@ -348,33 +342,20 @@ async function cargarPruebas() {
         console.error('Error al cargar las pruebas:', error);
     }
 }
-function cargarAdminPanel() {
-    if (document.getElementById('script-admin-panel')) return;
-    const script = document.createElement('script');
-    script.id = 'script-admin-panel';
-    script.src = 'Js/adminPanel.js';
-    script.onload = () => {
-        if (typeof window.abrirAdmin === 'function') window.abrirAdmin();
-    };
-    script.onerror = () => console.error('Error al cargar adminPanel.js');
-    document.head.appendChild(script);
-}
-window.abrirAdmin = cargarAdminPanel;
-
-document.addEventListener('DOMContentLoaded', async () => {
+// Inicializar todo cuando la página cargue
+window.onload = () => {
     observarReveal(document);
-
+    cargarFooter();
+    cargarStats();
     document.querySelectorAll('.btn-nav').forEach(button => {
         button.addEventListener('mouseenter', (event) => {
+            // Obtenemos el nombre de la sección del atributo data-id
             const seccion = event.target.getAttribute('data-id');
             desplazarA(seccion);
         });
     });
-
-    await Promise.all([
-        cargarFooter(),
-        cargarStats(),
-        obtenerDatos('/api/Usu', 'contenedor-perfil', (u) => `
+    // 1. Cargar Perfil
+    obtenerDatos('/api/Usu', 'contenedor-perfil', (u) => `
 <div class="perfil-card">
     <span class="perfil-estrella">Sobre mí</span>
     <h2 class="perfil-nombre">${u.nombre || ''} ${u.apellido || ''}</h2>
@@ -386,8 +367,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         ${chipContacto(u.githubUrl, SVG_GITHUB, 'GitHub', true)}
     </div>
 </div>
-    `),
-        obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `
+    `);
+
+    // 2. Cargar Experiencia
+    obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `
         <div class="resume-item">
             <h4>${e.cargo}</h4>
             <p><strong>A cargo de:</strong> ${e.experiencia}</p>
@@ -395,24 +378,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p>Fecha Inicio: ${e.fechaIni.split("T")[0]}</p>
             <p>Fecha Fin: ${e.fechaFin.split("T")[0]}</p>
         </div>
-    `),
-        obtenerDatos('/api/Educacion', 'lista-educacion', (ed) => `
+    `);
+
+    // 3. Cargar Educación
+    obtenerDatos('/api/Educacion', 'lista-educacion', (ed) => `
         <div class="resume-item">
             <h4>Institución: ${ed.institución}</h4>
             <p>Titulo: ${ed.titulo_Obtenido}</p>
             <p>Fecha Inicio: ${ed.fecha_Inicio.split("T")[0]}</p>
             <p>Fecha Fin: ${ed.fecha_Fin.split("T")[0]}</p>
         </div>
-    `),
-        obtenerDatos('/api/Habilidades', 'lista-tecnologias', (h) => {
-            const circuloHTML = crearCirculoNivel(h.nivel);
-            console.log(circuloHTML);
-            return `
+    `);
+    // 3. Cargar Habilidad
+    obtenerDatos('/api/Habilidades', 'lista-tecnologias', (h) => {
+        
+        const circuloHTML = crearCirculoNivel(h.nivel);
+        console.log(circuloHTML);
+        return `
     <div class="resume-item">
         <h4>Lenguaje de programación: ${h.nombre}</h4>
         ${circuloHTML}
     </div>
-    `}),
-        cargarPruebas()
-    ]);
-});
+    `});
+
+    // 4. Cargar Pruebas (evidencias)
+    cargarPruebas();
+};

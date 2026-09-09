@@ -278,7 +278,7 @@ async function cargarPruebas() {
                     <div class="prueba-portada">
                         ${items.map((p, ii) => `
                             <div class="prueba-pagina ${ii === 0 ? 'activa' : ''}">
-                                <img src="${archivoUrl(p.imagenUrl)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer">
+                                <img src="${archivoUrl(p.imagenUrl)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer" loading="lazy" decoding="async">
                             </div>`).join('')}
                         <span class="badge-ev">EVIDENCIA</span>
                         <span class="prueba-fecha">${fecha}</span>
@@ -291,7 +291,7 @@ async function cargarPruebas() {
                         <div class="prueba-strip">
                             ${items.map((p, ii) => `
                                 <button type="button" class="prueba-thumb ${ii === 0 ? 'activa' : ''}" data-page="${ii}" aria-label="Foto ${ii + 1}">
-                                    <img src="${archivoUrl(p.imagenUrl)}" alt="">
+                                    <img src="${archivoUrl(p.imagenUrl)}" alt="" loading="lazy" decoding="async">
                                 </button>`).join('')}
                         </div>` : ''}
                 </div>`;
@@ -343,8 +343,7 @@ async function cargarPruebas() {
         console.error('Error al cargar las pruebas:', error);
     }
 }
-// Inicializar todo cuando la página cargue
-window.onload = () => {
+function iniciarTodo() {
     observarReveal(document);
     cargarFooter();
     cargarStats();
@@ -404,4 +403,9 @@ window.onload = () => {
 
     // 4. Cargar Pruebas (evidencias)
     cargarPruebas();
-};
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciarTodo);
+} else {
+    iniciarTodo();
+}

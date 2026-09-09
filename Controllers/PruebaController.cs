@@ -25,7 +25,7 @@ namespace CurriBackendApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.pruebas.OrderByDescending(p => p.CreatedAt).ToListAsync());
+            return Ok(await _context.pruebas.AsNoTracking().OrderByDescending(p => p.CreatedAt).ToListAsync());
         }
 
         [HttpPost]

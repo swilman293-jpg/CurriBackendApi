@@ -22,7 +22,7 @@ namespace CurriBackendApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.experiencia_laboral.ToListAsync());
+            return Ok(await _context.experiencia_laboral.AsNoTracking().ToListAsync());
         }
 
         // POST: api/Habilidades

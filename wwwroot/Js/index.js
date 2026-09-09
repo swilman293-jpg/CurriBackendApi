@@ -415,4 +415,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     `}),
         cargarPruebas()
     ]);
-};
+});

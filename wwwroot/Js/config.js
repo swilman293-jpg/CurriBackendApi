@@ -3,15 +3,15 @@
 window.API_BASE = 'https://curribackendapi-1.onrender.com';
 
 // Convierte una ruta de la API ('/api/...') en URL completa.
-function apiUrl(ruta) {
+window.apiUrl = function(ruta) {
     const base = (window.API_BASE || '').replace(/\/+$/, '');
     return base + ruta;
-}
+};
 
 // Convierte una ruta de archivo ('/uploads/...') en URL completa.
-function archivoUrl(ruta) {
+window.archivoUrl = function(ruta) {
     if (!ruta) return '';
     if (/^https?:\/\//i.test(ruta)) return ruta;
     const base = (window.API_BASE || '').replace(/\/+$/, '');
     return base + ruta;
-}
+};

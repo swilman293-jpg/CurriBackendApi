@@ -63,6 +63,7 @@ namespace CurriBackendApi.Controllers
 
                 u.Nombre = dto.Nombre;
                 u.Apellido = dto.Apellido;
+                u.TituloProfesional = dto.TituloProfesional;
                 u.AcercaDe = dto.AcercaDe;
                 u.Email = dto.Email;
                 u.Telefono = dto.Telefono;

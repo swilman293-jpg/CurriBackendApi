@@ -5,7 +5,7 @@
     --texto-principal: #ffffff;
     --texto-secundario: #94a3b8;
     --fondo-base: #0a1128;
-    --fondo-tarjeta: #11192e;
+    --fondo-tarjeta: #0B1329;
     --borde-oscuro: #1e293b;
     --sombra-suave: 0 6px 18px rgba(2, 6, 23, 0.4);
     --sombra-gruesa: 0 24px 48px -12px rgba(2, 6, 23, 0.6);
@@ -20,6 +20,13 @@ body {
     margin: 0;
     padding: 0;
     color: var(--texto-principal);
+}
+
+body.bg-light {
+    background:
+        radial-gradient(1100px 750px at 92% -8%, rgba(0, 212, 255, 0.07), transparent 60%),
+        radial-gradient(900px 650px at -8% 108%, rgba(0, 229, 255, 0.05), transparent 55%),
+        var(--fondo-base) !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -398,10 +405,11 @@ header .col-md-8 {
 /* PRUEBAS - TARJETAS PREMIUM */
 .prueba-card {
     position: relative;
-    border: 1px solid var(--borde-oscuro);
+    border: 1px solid rgba(0, 212, 255, 0.2);
     border-radius: 16px;
     overflow: hidden;
     transform-style: preserve-3d;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 212, 255, 0.12);
     transition: transform 0.35s ease, box-shadow 0.45s ease;
     will-change: transform;
 }
@@ -409,6 +417,7 @@ header .col-md-8 {
 #contenedor-pruebas .card {
     border-radius: 16px;
     overflow: hidden;
+    background: var(--fondo-tarjeta);
     transition: transform 0.35s ease, box-shadow 0.45s ease;
 }
 
@@ -681,7 +690,7 @@ body.js-anim .reveal-visible {
     }
 
     .prueba-card:hover {
-        box-shadow: var(--sombra-gruesa), 0 0 0 1px rgba(0, 212, 255, 0.4);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 212, 255, 0.4), 0 0 20px rgba(0, 212, 255, 0.15);
     }
 
     .prueba-card:hover .badge-ev {

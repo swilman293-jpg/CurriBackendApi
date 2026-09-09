@@ -1,7 +1,7 @@
 ﻿console.log("El archivo index.js se está ejecutando...");
 document.body.classList.add('js-anim');
 import { crearCirculoNivel } from './components.js';
-async function obtenerDatos(url, contenedorId, renderFunction) {
+async function obtenerDatos(url, contenedorId, renderFunction, soloPrimero = false) {
     try {
         const response = await fetch(apiUrl(url));
         const data = await response.json();
@@ -16,7 +16,8 @@ async function obtenerDatos(url, contenedorId, renderFunction) {
         let htmlFragment = '';
 
         // 2. Construimos todo el HTML en memoria
-        data.forEach(item => {
+        const items = soloPrimero ? data.slice(0, 1) : data;
+        items.forEach(item => {
             htmlFragment += renderFunction(item);
         });
 
@@ -367,7 +368,7 @@ window.onload = () => {
         ${chipContacto(u.githubUrl, SVG_GITHUB, 'GitHub', true)}
     </div>
 </div>
-    `);
+    `, true);
 
     // 2. Cargar Experiencia
     obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `

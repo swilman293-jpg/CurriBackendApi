@@ -3,6 +3,7 @@ using CurriBackendApi.Models;
 using CurriBackendApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurriBackendApi.Controllers
@@ -14,18 +15,21 @@ namespace CurriBackendApi.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly ImagenService _imagenService;
+        private readonly IOutputCacheStore _cache;
 
-        public PruebaController(ApplicationDbContext context, IWebHostEnvironment environment, ImagenService imagenService)
+        public PruebaController(ApplicationDbContext context, IWebHostEnvironment environment, ImagenService imagenService, IOutputCacheStore cache)
         {
             _context = context;
             _environment = environment;
             _imagenService = imagenService;
+            _cache = cache;
         }
 
         [HttpGet]
+        [OutputCache(Duration = 120, Tags = new[] { "listas" })]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.pruebas.OrderByDescending(p => p.CreatedAt).ToListAsync());
+            return Ok(await _context.pruebas.AsNoTracking().OrderByDescending(p => p.CreatedAt).ToListAsync());
         }
 
         [HttpPost]
@@ -52,6 +56,7 @@ namespace CurriBackendApi.Controllers
 
             _context.pruebas.Add(prueba);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(prueba);
         }
@@ -80,6 +85,7 @@ namespace CurriBackendApi.Controllers
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
                 return Ok(prueba);
             }
             catch (Exception)
@@ -100,6 +106,7 @@ namespace CurriBackendApi.Controllers
 
             _context.pruebas.Remove(prueba);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(new { mensaje = "Eliminado con éxito." });
         }

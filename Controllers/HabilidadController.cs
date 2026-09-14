@@ -3,6 +3,7 @@ using CurriBackendApi.Models;
 using CurriBackendApi.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurriBackendApi.Controllers
@@ -12,17 +13,20 @@ namespace CurriBackendApi.Controllers
     public class HabilidadesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOutputCacheStore _cache;
 
-        public HabilidadesController(ApplicationDbContext context)
+        public HabilidadesController(ApplicationDbContext context, IOutputCacheStore cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // 1. GET: api/Habilidades
         [HttpGet]
+        [OutputCache(Duration = 120, Tags = new[] { "listas" })]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.tecnologias.ToListAsync());
+            return Ok(await _context.tecnologias.AsNoTracking().ToListAsync());
         }
 
         // POST: api/Habilidades
@@ -34,6 +38,7 @@ namespace CurriBackendApi.Controllers
 
             _context.tecnologias.Add(item);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(new { mensaje = "Guardado con éxito." });
         }
@@ -47,6 +52,7 @@ namespace CurriBackendApi.Controllers
 
             _context.tecnologias.Remove(h);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(new { mensaje = "Eliminado con éxito." });
         }
@@ -66,6 +72,7 @@ namespace CurriBackendApi.Controllers
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
                 return Ok(h);
             }
             catch (Exception)

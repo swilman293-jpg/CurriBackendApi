@@ -3,6 +3,7 @@ using CurriBackendApi.DTOs;
 using CurriBackendApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurriBackendApi.Controllers
@@ -12,17 +13,20 @@ namespace CurriBackendApi.Controllers
     public class EducacionController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOutputCacheStore _cache;
 
-        public EducacionController(ApplicationDbContext context)
+        public EducacionController(ApplicationDbContext context, IOutputCacheStore cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // 1. GET: api/
         [HttpGet]
+        [OutputCache(Duration = 120, Tags = new[] { "listas" })]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.educación.ToListAsync());
+            return Ok(await _context.educación.AsNoTracking().ToListAsync());
         }
 
         // POST: api/
@@ -36,6 +40,7 @@ namespace CurriBackendApi.Controllers
 
                 _context.educación.Add(item);
                 await _context.SaveChangesAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
                 return Ok(new { mensaje = "Guardado con éxito." });
             }
@@ -53,6 +58,7 @@ namespace CurriBackendApi.Controllers
 
             _context.educación.Remove(ed);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(new { mensaje = "Eliminado con éxito." });
         }
@@ -73,6 +79,7 @@ namespace CurriBackendApi.Controllers
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
                 return Ok(ed);
             }
             catch (Exception)

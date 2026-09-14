@@ -3,6 +3,7 @@ using CurriBackendApi.DTOs;
 using CurriBackendApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 
 namespace CurriBackendApi.Controllers
@@ -12,17 +13,20 @@ namespace CurriBackendApi.Controllers
     public class ExperienciaController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOutputCacheStore _cache;
 
-        public ExperienciaController(ApplicationDbContext context)
+        public ExperienciaController(ApplicationDbContext context, IOutputCacheStore cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // GET: api/Habilidades
         [HttpGet]
+        [OutputCache(Duration = 120, Tags = new[] { "listas" })]
         public async Task<IActionResult> Get()
         {
-            return Ok(await _context.experiencia_laboral.ToListAsync());
+            return Ok(await _context.experiencia_laboral.AsNoTracking().ToListAsync());
         }
 
         // POST: api/Habilidades
@@ -39,6 +43,7 @@ namespace CurriBackendApi.Controllers
             {
                 _context.experiencia_laboral.Add(item);
                 await _context.SaveChangesAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
                 return Ok(new { mensaje = "Guardado con éxito." });
             }
             catch (Exception ex)
@@ -55,6 +60,7 @@ namespace CurriBackendApi.Controllers
 
             _context.experiencia_laboral.Remove(e);
             await _context.SaveChangesAsync();
+            await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
 
             return Ok(new { mensaje = "Eliminado con éxito." });
         }
@@ -75,6 +81,7 @@ namespace CurriBackendApi.Controllers
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
+                await _cache.EvictByTagAsync("listas", HttpContext.RequestAborted);
                 return Ok(e);
             }
             catch (Exception)

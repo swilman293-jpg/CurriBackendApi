@@ -15,3 +15,16 @@ window.archivoUrl = function(ruta) {
     const base = (window.API_BASE || '').replace(/\/+$/, '');
     return base + ruta;
 };
+
+// Transformación Cloudinary: reescribe URL para servir imagen optimizada
+window.cdnUrl = function(ruta, ancho) {
+    if (!ruta) return '';
+    ancho = ancho || 900;
+    if (/res\.cloudinary\.com\/.+\/image\/upload\//.test(ruta)) {
+        return ruta.replace(
+            '/image/upload/',
+            '/image/upload/w_' + ancho + ',q_auto,f_auto,c_limit/'
+        );
+    }
+    return window.archivoUrl(ruta);
+};

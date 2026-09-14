@@ -1,7 +1,122 @@
-﻿console.log("El archivo index.js se está ejecutando...");
-document.body.classList.add('js-anim');
+﻿document.body.classList.add('js-anim');
 import { crearCirculoNivel } from './components.js';
-async function obtenerDatos(url, contenedorId, renderFunction, soloPrimero = false) {
+
+// ============ PRELOADER (progreso real con datos de la API) ============
+const PRECARGADOR_MIN_MS = 1000;
+const PRECARGADOR_TOTAL_FASES = 7;
+
+const progPref = {
+    t0: 0,
+    completadas: 0,
+    objetivo: 0,
+    valor: 0,
+    terminado: false,
+    barra: null,
+    pct: null,
+    animado: false,
+
+    iniciar() {
+        this.t0 = performance.now();
+        this.barra = document.getElementById('preloader-progreso');
+        this.pct = document.getElementById('preloader-pct');
+        if (this.pct) this.pct.textContent = '0%';
+    },
+
+    completa() {
+        if (this.terminado) return;
+        this.completadas += 1;
+        this.empuje(100 * this.completadas / PRECARGADOR_TOTAL_FASES);
+        if (this.completadas >= PRECARGADOR_TOTAL_FASES) this.terminar();
+    },
+
+    empuje(pct) {
+        if (pct > this.objetivo) this.objetivo = pct;
+        this.animar();
+    },
+
+    animar() {
+        if (this.animado) return;
+        this.animado = true;
+        const paso = () => {
+            const dif = this.objetivo - this.valor;
+            this.valor += Math.abs(dif) < 0.4 ? 0 : dif * 0.14;
+            if (Math.abs(dif) < 0.4) this.valor = this.objetivo;
+            this.pintar();
+            if (this.valor < this.objetivo - 0.2) {
+                requestAnimationFrame(paso);
+            } else {
+                this.animado = false;
+            }
+        };
+        requestAnimationFrame(paso);
+    },
+
+    pintar() {
+        if (this.barra) this.barra.style.width = this.valor + '%';
+        if (this.pct) this.pct.textContent = Math.round(this.valor) + '%';
+    },
+
+    terminar() {
+        if (this.terminado) return;
+        this.terminado = true;
+        this.objetivo = 100;
+        this.valor = 100;
+        this.pintar();
+        const espera = Math.max(0, PRECARGADOR_MIN_MS - (performance.now() - this.t0));
+        setTimeout(ocultarPreloader, espera);
+    },
+
+    fuerzaTerminar() {
+        if (!this.terminado) this.terminar();
+    }
+};
+
+function ocultarPreloader() {
+    const el = document.getElementById('preloader');
+    if (!el) return;
+    el.classList.add('preloader-ocultar');
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 750);
+}
+
+// Seguridad: el preloader nunca debe quedarse pegado, aunque una carga falle.
+setTimeout(() => progPref.fuerzaTerminar(), 6000);
+
+// ============ SKELETON SHIMMER (placeholder mientras cargan los datos) ============
+function plantillaSkeleton(tipo) {
+    if (tipo === 'perfil') {
+        return `<div class="skeleton-block">
+            <div class="skeleton skeleton-bloque"></div>
+            <div class="skeleton skeleton-linea w-60"></div>
+            <div class="skeleton skeleton-linea w-90"></div>
+            <div class="skeleton skeleton-linea w-80"></div>
+        </div>`;
+    }
+    if (tipo === 'prueba') {
+        return `<div class="skeleton skeleton-prueba"></div>`;
+    }
+    return `<div class="skeleton-block">
+        <div class="skeleton skeleton-linea w-50"></div>
+        <div class="skeleton skeleton-linea w-100"></div>
+        <div class="skeleton skeleton-linea w-75"></div>
+    </div>`;
+}
+
+function ponerSkeletons(contenedorId, tipo, cantidad) {
+    const contenedor = document.getElementById(contenedorId);
+    if (!contenedor) return;
+    let html = '';
+    for (let i = 0; i < cantidad; i++) html += plantillaSkeleton(tipo);
+    contenedor.innerHTML = html;
+}
+
+function marcarErrorSeccion(contenedorId) {
+    const contenedor = document.getElementById(contenedorId);
+    if (contenedor && contenedor.querySelector('.skeleton')) {
+        contenedor.innerHTML = '<p class="text-white-50 m-0">No se pudo cargar esta sección.</p>';
+    }
+}
+
+async function obtenerDatos(url, contenedorId, renderFunction, soloPrimero = false, onfin = null) {
     try {
         const response = await fetch(apiUrl(url));
         const data = await response.json();
@@ -28,6 +143,9 @@ async function obtenerDatos(url, contenedorId, renderFunction, soloPrimero = fal
 
     } catch (error) {
         console.error(`Error al cargar ${url}:`, error);
+        marcarErrorSeccion(contenedorId);
+    } finally {
+        if (typeof onfin === 'function') onfin();
     }
 }
 function desplazarA(id) {
@@ -78,6 +196,21 @@ function chipContacto(href, icono, texto, esExterno) {
     if (!href) return '';
     const target = esExterno ? ' target="_blank" rel="noopener"' : '';
     return `<a class="chip-contacto" href="${href}"${target}><span class="chip-ico">${icono}</span>${texto}</a>`;
+}
+
+// Formatea fechas ISO ("2023-01-15T00:00:00") a "Enero 2023". Si `fin` es true y no
+// existe valor (o es el default vacío 0001-01-01), devuelve "Actualidad".
+function formatearFecha(iso, fin) {
+    if (!iso) return fin ? 'Actualidad' : 'Sin registro';
+    const partes = String(iso).split('T')[0].split('-');
+    if (partes.length !== 3) return String(iso);
+    let anio = Number(partes[0]);
+    const mes = Number(partes[1]);
+    if (!Number.isFinite(anio)) anio = 0;
+    if (anio <= 1) return fin ? 'Actualidad' : 'Sin registro';
+    const nombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    const nombreMes = (mes >= 1 && mes <= 12) ? nombres[mes - 1] : '';
+    return nombreMes ? `${nombreMes} ${anio}` : String(anio);
 }
 
 // Stats del hero con conteo animado
@@ -152,7 +285,7 @@ let luzIndice = 0;
 function pintarLuz() {
     const p = pruebasLista[luzIndice];
     const img = document.getElementById('imagen-luz');
-    img.src = archivoUrl(p.imagenUrl);
+    img.src = window.cdnUrl(p.imagenUrl, 1600);
     document.getElementById('luz-contador').textContent = (luzIndice + 1) + ' / ' + pruebasLista.length;
     document.getElementById('luz-caption').textContent = p.descripcion || '';
     document.getElementById('luz-prev').disabled = pruebasLista.length <= 1;
@@ -278,7 +411,7 @@ async function cargarPruebas() {
                     <div class="prueba-portada">
                         ${items.map((p, ii) => `
                             <div class="prueba-pagina ${ii === 0 ? 'activa' : ''}">
-                                <img src="${archivoUrl(p.imagenUrl)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer" loading="lazy" decoding="async">
+                                <img src="${window.cdnUrl(p.imagenUrl, 900)}" class="prueba-img" alt="Evidencia" data-id="${p.id}" style="cursor:pointer" loading="lazy" decoding="async">
                             </div>`).join('')}
                         <span class="badge-ev">EVIDENCIA</span>
                         <span class="prueba-fecha">${fecha}</span>
@@ -291,7 +424,7 @@ async function cargarPruebas() {
                         <div class="prueba-strip">
                             ${items.map((p, ii) => `
                                 <button type="button" class="prueba-thumb ${ii === 0 ? 'activa' : ''}" data-page="${ii}" aria-label="Foto ${ii + 1}">
-                                    <img src="${archivoUrl(p.imagenUrl)}" alt="" loading="lazy" decoding="async">
+                                    <img src="${window.cdnUrl(p.imagenUrl, 160)}" alt="" loading="lazy" decoding="async">
                                 </button>`).join('')}
                         </div>` : ''}
                 </div>`;
@@ -341,12 +474,14 @@ async function cargarPruebas() {
         }
     } catch (error) {
         console.error('Error al cargar las pruebas:', error);
+        marcarErrorSeccion('contenedor-pruebas');
     }
 }
 function iniciarTodo() {
+    progPref.iniciar();
     observarReveal(document);
-    cargarFooter();
-    cargarStats();
+    cargarFooter().finally(() => progPref.completa());
+    cargarStats().finally(() => progPref.completa());
     document.querySelectorAll('.btn-nav').forEach(button => {
         button.addEventListener('mouseenter', (event) => {
             // Obtenemos el nombre de la sección del atributo data-id
@@ -354,7 +489,8 @@ function iniciarTodo() {
             desplazarA(seccion);
         });
     });
-    // 1. Cargar Perfil
+// 1. Cargar Perfil
+    ponerSkeletons('contenedor-perfil', 'perfil', 1);
     obtenerDatos('/api/Usu', 'contenedor-perfil', (u) => `
 <div class="perfil-card">
     <span class="perfil-estrella">Sobre mí</span>
@@ -367,42 +503,43 @@ function iniciarTodo() {
         ${chipContacto(u.githubUrl, SVG_GITHUB, 'GitHub', true)}
     </div>
 </div>
-    `, true);
+    `, true, () => progPref.completa());
 
     // 2. Cargar Experiencia
+    ponerSkeletons('contenedor-experiencia', 'resume', 3);
     obtenerDatos('/api/Experiencia', 'contenedor-experiencia', (e) => `
         <div class="resume-item">
             <h4>${e.cargo}</h4>
             <p><strong>A cargo de:</strong> ${e.experiencia}</p>
-           
-            <p>Fecha Inicio: ${e.fechaIni.split("T")[0]}</p>
-            <p>Fecha Fin: ${e.fechaFin.split("T")[0]}</p>
+            <p>Fecha Inicio: ${formatearFecha(e.fechaIni)}</p>
+            <p>Fecha Fin: ${formatearFecha(e.fechaFin, true)}</p>
         </div>
-    `);
+    `, false, () => progPref.completa());
 
     // 3. Cargar Educación
+    ponerSkeletons('lista-educacion', 'resume', 3);
     obtenerDatos('/api/Educacion', 'lista-educacion', (ed) => `
         <div class="resume-item">
             <h4>Institución: ${ed.institución}</h4>
             <p>Titulo: ${ed.titulo_Obtenido}</p>
-            <p>Fecha Inicio: ${ed.fecha_Inicio.split("T")[0]}</p>
-            <p>Fecha Fin: ${ed.fecha_Fin.split("T")[0]}</p>
+            <p>Fecha Inicio: ${formatearFecha(ed.fecha_Inicio)}</p>
+            <p>Fecha Fin: ${formatearFecha(ed.fecha_Fin, true)}</p>
         </div>
-    `);
+    `, false, () => progPref.completa());
     // 3. Cargar Habilidad
+    ponerSkeletons('lista-tecnologias', 'resume', 4);
     obtenerDatos('/api/Habilidades', 'lista-tecnologias', (h) => {
-        
         const circuloHTML = crearCirculoNivel(h.nivel);
-        console.log(circuloHTML);
         return `
     <div class="resume-item">
         <h4>Lenguaje de programación: ${h.nombre}</h4>
         ${circuloHTML}
-    </div>
-    `});
+</div>
+`}, false, () => progPref.completa());
 
     // 4. Cargar Pruebas (evidencias)
-    cargarPruebas();
+    ponerSkeletons('contenedor-pruebas', 'prueba', 6);
+    cargarPruebas().finally(() => progPref.completa());
 }
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', iniciarTodo);

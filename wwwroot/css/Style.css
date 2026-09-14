@@ -124,8 +124,8 @@ header > * {
     height: auto;
     object-fit: cover;
     border-radius: 60%;
-    border: 6px solid white;
-    box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+    border: 3px solid rgba(0, 212, 255, 0.55);
+    box-shadow: 0 0 0 6px rgba(0, 212, 255, 0.12), 0 15px 50px rgba(0, 0, 0, 0.25);
     display: block;
     margin: 0 auto;
 }
@@ -144,6 +144,35 @@ header > * {
     color: #e5e7eb;
     max-width: 3100px;
     margin: auto;
+}
+
+/* CHIP TELÉFONO HERO */
+.hero-telefono {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    color: #00d4ff;
+    background: rgba(0, 212, 255, 0.12);
+    border: 1px solid rgba(0, 212, 255, 0.35);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-weight: 500;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: background 0.25s ease, box-shadow 0.25s ease, color 0.25s ease;
+}
+.hero-telefono span {
+    color: #e5e7eb;
+    transition: color 0.25s ease;
+}
+.hero-telefono:hover {
+    background: rgba(0, 212, 255, 0.22);
+    box-shadow: 0 0 18px rgba(0, 212, 255, 0.3);
+    color: #ffffff;
+}
+.hero-telefono:hover span {
+    color: #ffffff;
 }
 
 /* PERFIL */
@@ -416,6 +445,38 @@ header .col-md-8 {
     font-family: 'Poppins', 'Segoe UI', sans-serif;
     font-weight: 600;
     letter-spacing: 0.3px;
+}
+
+/* SKELETON SHIMMER (carga de secciones) */
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, #162032 25%, #1b2438 37%, #162032 63%);
+    background-size: 400% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+    border-radius: 8px;
+}
+.skeleton-bloque { height: 110px; border-radius: 14px; }
+.skeleton-linea { height: 14px; margin: 12px 0; border-radius: 6px; }
+.skeleton-prueba { height: 220px; border-radius: 16px; margin-bottom: 18px; }
+.skeleton-block { margin-bottom: 16px; }
+.w-50 { width: 50%; }
+.w-60 { width: 60%; }
+.w-75 { width: 75%; }
+.w-80 { width: 80%; }
+.w-90 { width: 90%; }
+.w-100 { width: 100%; }
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .skeleton { animation: none; }
+}
+
+/* Anclas bajo la navbar sticky */
+#perfil, #experiencia, #educacion, #tecnologias, #pruebas {
+    scroll-margin-top: 90px;
 }
 
 /* PRUEBAS - TARJETAS PREMIUM */
